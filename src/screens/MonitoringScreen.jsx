@@ -63,6 +63,9 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
   const [showFinalFeedbackModal, setShowFinalFeedbackModal] = useState(false);
 
   const isYoga = route?.params?.setYoga ?? false;
+  const isAttire = route?.params?.setAttire ?? false;
+
+
   
     useEffect(() => {
       console.log('Yoga Mode?', isYoga); // true or false   // yoga or false  
@@ -73,6 +76,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
     
     // You can also set it to a state if needed:
     const [yogaMode, setYogaMode] = useState(isYoga);
+    const [attireMode , setAttireMode] = useState(isAttire);
 
   // Posture monitoring
   const {
@@ -110,6 +114,13 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
           console.log('[WebView pose data]', data);
           setPostureData(() => data.posture);
           break;
+
+        case 'attire_analysis':
+          // Process pose data with timestamp
+          console.log('[WebView pose data]', data);
+          console.log("Attire check in monitoring screen ",data)
+          
+          break;  
 
         case 'yoga_analysis':
           // Process pose data with timestamp
@@ -155,6 +166,19 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
 
       const path = photo.path;
       const base64 = await RNFS.readFile(path, 'base64');
+
+
+      if(attireMode===true){
+        console.log("attire check modal is running")
+        const message = {
+        command: 'attire',
+        image: `data:image/jpeg;base64,${base64}`,
+        from: 'sending photo',
+        };
+        console.log('Sending photo to WebView');
+        webviewRef.current.postMessage(JSON.stringify(message));
+        console.log('Photo sent to WebView');
+      }
 
 
       if(yogaMode===false){

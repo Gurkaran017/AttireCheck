@@ -14,7 +14,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window")
 
 const HowItWorksScreen = ({ navigation }) => {
   const handleStartMonitoring = () => {
-    navigation.navigate("PostureMonitoring", { setYoga: false })
+    navigation.navigate("PostureMonitoring", { setYoga: false , setAttire:false })
   }
 
   return (

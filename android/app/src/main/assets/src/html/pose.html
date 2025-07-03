@@ -13,14 +13,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-cpu"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script> -->
+
   </head>
 
   <body>
     <script>
       let detector = null;
       let yogaMode = false;
+      let attireMode = false;
       let selectedAsana = '';
       const asanaFeedbackList = [];
+
+      let attireModel, maxPredictions;
 
       // Notify React Native that the WebView is ready
       window.addEventListener('load', () => {
@@ -35,16 +43,26 @@
           await tf.setBackend('cpu');
           await tf.ready();
 
-          const model =  await poseDetection.SupportedModels.MoveNet;
+          const model = poseDetection.SupportedModels.MoveNet;
+
           detector = await poseDetection.createDetector(model, {
             modelType: 'SinglePose.Lightning',
           });
+
+          attireModel = await mobilenet.load();
+
+          // const modelURL = "/my_model/model.json";
+          // const metadataURL = "/my_model/metadata.json";
+          // attireModel = await tmImage.load(modelURL, metadataURL);
+          // maxPredictions = attireModel.getTotalClasses();
+
+
 
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               type: 'ready',
               status: 'model_ready',
-              message: '✅ MoveNet loaded with CPU backend',
+              message: '✅ MoveNet , Teachable Machine model & MobileNet loaded with CPU backend',
               timestamp: Date.now(),
             }),
           );
@@ -52,11 +70,194 @@
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               type: 'error',
-              message: '❌ Model init failed: ' + err.message,
+              message: '❌ attire Model init failed: ' + err.message,
             }),
           );
         }
       }
+
+      async function analyzeAttire(imgElement) {
+  if (!attireModel) {
+    return {
+      status: 'error',
+      message: 'Attire model not loaded',
+    };
+  }
+
+  const predictions = await attireModel.classify(imgElement);
+
+  const professionalKeywords = [
+    'suit',
+    'blazer',
+    'jacket',
+    'shirt',
+    'tie',
+    'person',
+    'sleeve',
+    'collar',
+    'formal',
+    'business',
+    'office',
+    'coat',
+    'trousers',
+    'pants',
+    'dress shirt',
+    'waistcoat',
+    'necktie',
+    'polo',
+    'vest',
+    'long sleeve',
+    'blouse',
+    'button-up',
+    'button down',
+    'slacks',
+    'business casual',
+    'skirt',
+    'heels',
+    'oxfords',
+    'dress shoes',
+    'scarf',
+    'turtleneck',
+    'pinstripe',
+    'smart casual',
+    'corporate',
+    'workwear',
+    'formalwear',
+    'uniform',
+    'suit jacket',
+    'pressed shirt',
+    'professional outfit',
+    'tie clip',
+    'clothing',
+    'long sleeve shirt',
+    'collared shirt',
+    'upper body clothing'
+];
+
+  // Check all predictions for any professional keyword
+  let isProfessional = false;
+  let detectedLabel = '';
+
+  for (const prediction of predictions) {
+    const className = prediction.className.toLowerCase();
+
+    if (professionalKeywords.some(keyword => className.includes(keyword))) {
+      isProfessional = true;
+      detectedLabel = className;
+      break; // Stop at first match
+    }
+  }
+
+  // If none matched, use top prediction as label
+  if (!detectedLabel && predictions[0]) {
+    detectedLabel = predictions[0].className.toLowerCase();
+  }
+
+  return {
+    attire: detectedLabel,
+    professional: isProfessional,
+    message: isProfessional
+      ? '✅ You look professionally dressed'
+      : '⚠️ Your attire may not look professional',
+  };
+}
+
+
+
+//       async function analyzeAttire(imgElement) {
+//   if (!attireModel) {
+//     return {
+//       status: 'error',
+//       message: 'Attire model not loaded',
+//     };
+//   }
+
+//   const predictions = await attireModel.classify(imgElement);
+
+//   const professionalKeywords = [
+//   'suit',
+//   'blazer',
+//   'jacket',
+//   'shirt',
+//   'tie',
+//   'person',
+//   'sleeve',
+//   'collar',
+//   'formal',
+//   'business',
+//   'office',
+//   'coat',
+//   'trousers',
+//   'pants',
+//   'dress shirt',
+//   'waistcoat',
+//   'necktie',
+//   'polo',
+//   'vest',
+//   'long sleeve',
+//   'blouse',
+//   'button-up',
+//   'button down',
+//   'slacks',
+//   'business casual',
+//   'skirt',
+//   'heels',
+//   'oxfords',
+//   'dress shoes',
+//   'scarf',
+//   'turtleneck',
+//   'pinstripe',
+//   'smart casual',
+//   'corporate',
+//   'workwear',
+//   'formalwear',
+//   'uniform',
+//   'suit jacket',
+//   'pressed shirt',
+//   'professional outfit',
+//   'tie clip'
+// ];
+
+//   const topResult = predictions[0]?.className.toLowerCase() || '';
+
+//   const isProfessional = professionalKeywords.some(keyword =>
+//     topResult.includes(keyword)
+//   );
+
+//   return {
+//     attire: topResult,
+//     professional: isProfessional,
+//     message: isProfessional
+//       ? '✅ You look professionally dressed'
+//       : '⚠️ Your attire may not look professional',
+//   };
+// }
+      
+  
+
+//      async function analyzeAttire(imgElement) {
+//   if (!attireModel) {
+//     return {
+//       status: 'error',
+//       message: 'Attire model not loaded',
+//     };
+//   }
+
+//   const predictions = await attireModel.predict(imgElement);
+
+//   const topResult = predictions[0];
+//   const isProfessional = topResult.className.toLowerCase().includes('professional');
+
+//   return {
+//     attire: topResult.className,
+//     professional: isProfessional,
+//     probability: topResult.probability,
+//     message: isProfessional
+//       ? '✅ You look professionally dressed'
+//       : '⚠️ Your attire may not look professional',
+//   };
+// }
+
 
       function analyzePosture(pose) {
         const keypoints = pose[0]?.keypoints;
@@ -361,7 +562,25 @@
               const pose = await detector.estimatePoses(img);
 
               if(selectedAsana===""){
-                const posture = analyzePosture(pose);
+
+                if (attireMode === true) {
+    const attireData = await analyzeAttire(img);
+
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'attire_analysis',
+        status: 'success',
+        attire: attireData,
+        pose,
+        timestamp: Date.now(),
+      }),
+    );
+
+    document.body.removeChild(img);
+    resolve(pose);
+                }
+                else{
+                  const posture = analyzePosture(pose);
 
                 window.ReactNativeWebView.postMessage(
                 JSON.stringify({
@@ -375,9 +594,10 @@
 
               document.body.removeChild(img);
               resolve(pose);
+                }
               }
 
-              else{
+              else if (selectedAsana !== "") {
 
                 const feedback = generateAsanaFeedback(pose, selectedAsana)
 
@@ -446,6 +666,31 @@
                 );
               });
           } 
+
+          if (message.command === 'attire' && message.image) {
+            attireMode = true;
+            predictPoseFromBase64(message.image)
+              .then(() => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'log',
+                    message: '✅ attire check prediction completed',
+                    timestamp: Date.now(),
+                  }),
+                );
+              })
+              .catch(err => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'error',
+                    message: '❌ Prediction failed: ' + err.message,
+                    timestamp: Date.now(),
+                  }),
+                );
+              });
+          } 
+
+
           if (message.command === "init" && message.yogaMode) {
         yogaMode = true;
         selectedAsana = message.asanaName;

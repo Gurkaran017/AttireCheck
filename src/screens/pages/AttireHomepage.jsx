@@ -14,7 +14,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window")
 
 const AttireHomepage = ({ navigation }) => {
   const handleStartStyling = () => {
-    navigation.navigate("PostureMonitoring", { setYoga: false })
+    navigation.navigate("PostureMonitoring", { setYoga: false , setAttire:true })
   }
 
   return (
