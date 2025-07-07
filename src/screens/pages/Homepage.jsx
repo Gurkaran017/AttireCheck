@@ -18,7 +18,7 @@ const HowItWorksScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0f766e" />
 
       <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
@@ -166,7 +166,7 @@ const HowItWorksScreen = ({ navigation }) => {
           <Text style={styles.buttonArrow}>→</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

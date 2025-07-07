@@ -21,6 +21,7 @@ const CameraOverlay = ({
   onChangeAsana,
   yogaMode,
   yogaData,
+  attireData
 }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideTopAnim = useRef(new Animated.Value(0)).current;
@@ -91,6 +92,7 @@ const CameraOverlay = ({
               reason={postureData?.reason}
               yogaFeedback={yogaData.feedback}
               yogaMode={yogaMode}
+              attireData={attireData}
             />
           </Animated.View>
         )}

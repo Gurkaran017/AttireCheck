@@ -35,16 +35,25 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
   const webviewRef = useRef(null);
 
-  const webViewSource = {
-    uri:
-      Platform.OS === 'android'
-        ? 'file:///android_asset/src/html/pose.html'
-        : `${RNFS.MainBundlePath}/src/html/pose.html`,
-    baseUrl:
-      Platform.OS === 'android'
-        ? 'file:///android_asset/src/html/'
-        : `${RNFS.MainBundlePath}/src/html/`,
-  };
+  // const webViewSource = {
+  //   uri:
+  //     Platform.OS === 'android'
+  //       ? 'file:///android_asset/src/html/pose.html'
+  //       : `${RNFS.MainBundlePath}/src/html/pose.html`,
+  //   baseUrl:
+  //     Platform.OS === 'android'
+  //       ? 'file:///android_asset/src/html/'
+  //       : `${RNFS.MainBundlePath}/src/html/`,
+  // };
+
+  const webViewSource = Platform.select({
+  android: {
+    uri: 'file:///android_asset/src/html/pose.html',
+    baseUrl: 'file:///android_asset/src/html/',
+  },
+  ios: require('../../ios/assets/pose.html'), // or wherever it is now inside the Xcode bundle
+});
+
 
   // Camera hooks
   const devices = useCameraDevices();
@@ -56,6 +65,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
   const [cameraPosition, setCameraPosition] = useState('front');
   const [showControls, setShowControls] = useState(true);  
   const [postureData, setPostureData] = useState(null);
+  const [attireData, setAttireData] = useState(null);
   const [showAsanaModal, setShowAsanaModal] = useState(false);
 
   const [selectedAsana, setSelectedAsana] = useState('Tadasana');
@@ -87,7 +97,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
     alertsCount,
     handleStartStop,
     
-  } = usePostureMonitoring(postureData,yogaMode,yogaData);
+  } = usePostureMonitoring(postureData,yogaMode,yogaData ,attireData );
 
   
 
@@ -96,12 +106,12 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
       const data = await JSON.parse(event.nativeEvent.data);
       console.log('WebView message received:', data);
 
-      console.log('Received from WebView:', {
-        type: data.type,
-        timestamp: data.timestamp,
-        message: data.message,
-        from: data.from,
-      });
+      // console.log('Received from WebView:', {
+      //   type: data.type,
+      //   timestamp: data.timestamp,
+      //   message: data.message,
+      //   from: data.from,
+      // });
 
       // Handle different message types
       switch (data.type) {
@@ -117,13 +127,17 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
 
         case 'attire_analysis':
           // Process pose data with timestamp
-          console.log('[WebView pose data]', data);
-          console.log("Attire check in monitoring screen ",data)
-          
+          // console.log('[WebView pose data]', data);
+          setAttireData(data.attire.message)
+          console.log("attire messageis thiiiiiiis ",data.attire.message)
+          // console.log("chal geya maja aa geya ")
+
+          // console.log("Attire check in monitoring screen ",data)
           break;  
 
         case 'yoga_analysis':
           // Process pose data with timestamp
+          console.log("mai hun chutiya")
           console.log('[WebView pose data]', data);
           console.log("yoga all feedback is ",data.feedback)
           console.log("issue from yoga" , data.issue)
@@ -136,6 +150,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         case 'ready':
           console.log('WebView model loaded successfully');
           setWebViewLoaded(true);
+          break; // ← ADD THIS
 
         case 'ping':
           console.log('WebView ping received');
@@ -303,13 +318,14 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
   </Modal>
 )}
 
-
+    
       <CameraView
         ref={cameraRef}
         style={StyleSheet.absoluteFill}
         device={chosenCameraDevice}
         isActive={isCameraActive}
       />
+      
 
       <WebView
         ref={webviewRef}
@@ -320,7 +336,8 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         startInLoadingState={true}
-        style={{height: 1, width: 1}}
+        // style={{height: 1, width: 1}}
+        style={{ position: 'absolute', height: 1, width: 1, opacity: 0 }}
       />
 
       {webViewError && (
@@ -335,6 +352,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         sessionTime={sessionTime}
         postureData={postureData} // ✅ pass here
         yogaData={yogaData}
+        attireData={attireData}
         yogaMode={yogaMode}
         alertsCount={alertsCount}
         cameraPosition={cameraPosition}
@@ -357,7 +375,8 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: 'transparent',
+    overflow: 'hidden',
   },
   errorContainer: {
     position: 'absolute',

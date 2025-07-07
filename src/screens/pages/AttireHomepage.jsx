@@ -18,7 +18,7 @@ const AttireHomepage = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#e91e63" />
       <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
         {/* Header Section with Gradient */}
@@ -128,7 +128,7 @@ const AttireHomepage = ({ navigation }) => {
           <Text style={styles.buttonArrow}>→</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
+    
   },
   scrollViewContent: {
     minHeight: SCREEN_HEIGHT,

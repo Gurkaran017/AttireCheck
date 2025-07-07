@@ -21,6 +21,10 @@ export const getPostureMessage = (status) => {
       return "Poor posture - adjust!";
     case "unknown":
       return "Position yourself";
+    case "attire1":
+      return "✅ You look professionally dressed"  
+    case "attire2":
+      return "⚠️ Your attire may not look professional"    
     default:
       return status;
   }

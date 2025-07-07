@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-cpu"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
-   
+
   </head>
 
   <body>
@@ -34,7 +34,6 @@
         );
       });
 
-     
 
       async function prepareModel() {
         try {
@@ -48,8 +47,7 @@
           });
 
           attireModel = await mobilenet.load();
-
-
+         
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               type: 'ready',
@@ -69,12 +67,6 @@
       }
 
       async function analyzeAttire(imgElement) {
-  if (!attireModel) {
-    return {
-      status: 'error',
-      message: 'Attire model not loaded',
-    };
-  }
 
   const predictions = await attireModel.classify(imgElement);
 
@@ -157,9 +149,12 @@
     attire: detectedLabel,
     professional: isProfessional,
     predictions,
+    // message: isProfessional
+    //   ? '✅ You look professionally dressed'
+    //   : '⚠️ Your attire may not look professional',
     message: isProfessional
-      ? '✅ You look professionally dressed'
-      : '⚠️ Your attire may not look professional',
+      ? 'attire1'
+      : 'attire2',  
   };
 }
 
@@ -470,15 +465,29 @@
                 if (attireMode === true) {
     const attireData = await analyzeAttire(img);
 
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        type: 'attire_analysis',
-        status: 'success',
-        attire: attireData,
-        pose,
-        timestamp: Date.now(),
-      }),
-    );
+    // window.ReactNativeWebView.postMessage(
+    //   JSON.stringify({
+    //     type: 'attire_analysis',
+    //     status: 'success',
+    //     attire: attireData,
+    //     pose,
+    //     timestamp: Date.now(),
+    //   }),
+    // );
+    const safeAttireData = JSON.parse(JSON.stringify(attireData));
+// const safePose = JSON.parse(JSON.stringify(pose));
+
+window.ReactNativeWebView.postMessage(
+  JSON.stringify({
+    type: 'attire_analysis',
+    status: 'success',
+    attire: safeAttireData,
+    // attire: "hello ji",
+    // pose: safePose,
+    timestamp: Date.now(),
+  })
+);
+
 
     document.body.removeChild(img);
     resolve(pose);
@@ -640,8 +649,14 @@
         }
       }
 
-      window.ReactNativeWebView.onMessage = handleLogMessage;
-      document.addEventListener('message', handleLogMessage);
+      // window.ReactNativeWebView.onMessage = handleLogMessage;
+      // document.addEventListener('message', handleLogMessage);
+
+      window.onload = function () {
+  document.addEventListener("message", handleLogMessage); // Android
+  window.addEventListener("message", handleLogMessage);   // iOS
+};
+
 
       // Notify React Native immediately and start model prep
       window.ReactNativeWebView.postMessage(

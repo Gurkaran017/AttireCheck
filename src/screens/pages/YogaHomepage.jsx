@@ -18,7 +18,7 @@ const YogaHomepage = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#667eea" />
 
       <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
@@ -126,7 +126,7 @@ const YogaHomepage = ({ navigation }) => {
           <Text style={styles.buttonArrow}>→</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

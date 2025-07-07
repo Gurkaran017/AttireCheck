@@ -14,21 +14,25 @@ const PostureIndicator = ({
   postureStatus = "unknown",
   reason = null,
   yogaFeedback ,
-  yogaMode
+  yogaMode,
+  attireData
 }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
 
+  // const message = yogaMode === false
+  // ? getPostureMessage(postureStatus)
+  // : getPostureMessage(yogaFeedback?.length > 0 ? yogaFeedback : "unknown");
 
-  console.log("yogaaaaaaaMode 11111", yogaMode)
-  console.log("yogaFeedbackkkkk",yogaFeedback)
+  // console.log(message)
 
+  const message = yogaMode && yogaFeedback?.length > 0
+    ? getPostureMessage(yogaFeedback)
+    : attireData
+    ? getPostureMessage(attireData)
+    : getPostureMessage(postureStatus);
 
-  const message = yogaMode === false
-  ? getPostureMessage(postureStatus)
-  : getPostureMessage(yogaFeedback?.length > 0 ? yogaFeedback : "unknown");
-
-  console.log(message)
+  console.log("Final message:", message);
   
 
   useEffect(() => {
