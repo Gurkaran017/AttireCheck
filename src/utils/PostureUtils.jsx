@@ -25,6 +25,16 @@ export const getPostureMessage = (status) => {
       return "✅ You look professionally dressed"  
     case "attire2":
       return "⚠️ Your attire may not look professional"    
+    case "groomingGood":
+      return "✅ Face is clearly visible and properly framed"   
+    case "grooming1":
+      return "⚠️ Face appears blurry. Improve lighting or focus."
+    case "grooming2":
+      return "⚠️ Face size seems too small or too large"    
+    case "grooming3":
+      return "⚠️ Face is not centered. Align your face more toward the middle."            
+    case "fail":
+      return "No face detected. Make sure your face is clearly visible."              
     default:
       return status;
   }

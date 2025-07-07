@@ -14,6 +14,7 @@ const Tab = createBottomTabNavigator();
 const PostureHome = require('./src/screens/pages/Homepage').default;
 const YogaHome = require('./src/screens/pages/YogaHomepage').default;
 const AttireHome = require('./src/screens/pages/AttireHomepage').default;
+const GroomingHome = require('./src/screens/pages/GroomingHomepage').default;
 const PostureMonitoring = require('./src/screens/MonitoringScreen').default;
 const YogaMonitoring = require('./src/screens/YogaMonitoring').default;
 
@@ -27,7 +28,7 @@ const BottomTabs = () => (
     }}
   >
     <Tab.Screen
-      name="Posture Check"
+      name="Posture"
       component={PostureHome}
       options={{
         tabBarIcon: ({ color, size }) => (
@@ -36,7 +37,7 @@ const BottomTabs = () => (
       }}
     />
     <Tab.Screen
-      name="Attire Check"
+      name="Attire"
       component={AttireHome}
       options={{
         tabBarIcon: ({ color, size }) => (
@@ -45,11 +46,20 @@ const BottomTabs = () => (
       }}
     />
     <Tab.Screen
-      name="Yoga Posture Check"
+      name="Yoga"
       component={YogaHome}
       options={{
         tabBarIcon: ({ color, size }) => (
           <Icon name="fitness-outline" color={color} size={size} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Groom"
+      component={GroomingHome}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="sparkles-outline" color={color} size={size} />
         ),
       }}
     />

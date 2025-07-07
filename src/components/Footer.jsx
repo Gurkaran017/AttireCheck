@@ -9,6 +9,7 @@ const BottomControls = ({
   selectedAsana,
   onChangeAsana,
   yogaMode, // receives true or false
+  enableButton
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -20,17 +21,20 @@ const BottomControls = ({
       >
         {/* Start/Stop Button */}
         <TouchableOpacity
-          onPress={onStartStop}
-          style={[
-            styles.actionButton,
-            { backgroundColor: isMonitoring ? "#F87171" : "#14B8A6" },
-          ]}
-          activeOpacity={0.9}
-        >
-          <Text style={styles.buttonText}>
-            {isMonitoring ? "Stop Session" : "Start Session"}
-          </Text>
-        </TouchableOpacity>
+  disabled={!enableButton}
+  onPress={onStartStop}
+  style={[
+    styles.actionButton,
+    { backgroundColor: isMonitoring ? "#F87171" : "#14B8A6" },
+    !enableButton && styles.buttonDisabled, // 👈 apply dim style if disabled
+  ]}
+  activeOpacity={0.9}
+>
+  <Text style={styles.buttonText}>
+    {isMonitoring ? "Stop Session" : "Start Session"}
+  </Text>
+</TouchableOpacity>
+
 
         {/* Asana Change Icon - only visible in yogaMode */}
         {yogaMode && (
@@ -92,5 +96,8 @@ const styles = StyleSheet.create({
   iconDisabled: {
     opacity: 0.5, // Dimmed appearance when disabled
   },
+  buttonDisabled: {
+  opacity: 0.5,
+},
 });
 

@@ -66,7 +66,10 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
   const [showControls, setShowControls] = useState(true);  
   const [postureData, setPostureData] = useState(null);
   const [attireData, setAttireData] = useState(null);
+  const [groomingData, setGroomingData] = useState(null);
+  const [groomingStatus, setGroomingStatus] = useState(null);
   const [showAsanaModal, setShowAsanaModal] = useState(false);
+  const [enableButton, setEnableButton] = useState(false);
 
   const [selectedAsana, setSelectedAsana] = useState('Tadasana');
   const [yogaData, setYogaData] = useState([]);
@@ -74,6 +77,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
 
   const isYoga = route?.params?.setYoga ?? false;
   const isAttire = route?.params?.setAttire ?? false;
+  const isGrooming = route?.params?.setGrooming ?? false;
 
 
   
@@ -87,6 +91,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
     // You can also set it to a state if needed:
     const [yogaMode, setYogaMode] = useState(isYoga);
     const [attireMode , setAttireMode] = useState(isAttire);
+    const [groomingMode , setGroomingMode] = useState(isGrooming);
 
   // Posture monitoring
   const {
@@ -125,14 +130,21 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
           setPostureData(() => data.posture);
           break;
 
+        case 'grooming_analysis':
+          console.log("grooming messageis thiiiiiiis ",data)
+          // console.log("tatti khalo friends",data.grooming.status)
+          // console.log("tatti khalo friends",data.grooming.message)
+          // setGroomingData(data.grooming.message);
+          setGroomingData(
+    data.grooming.message !== undefined
+      ? data.grooming.message
+      : data.grooming.status
+  );
+          break;
+
         case 'attire_analysis':
-          // Process pose data with timestamp
-          // console.log('[WebView pose data]', data);
           setAttireData(data.attire.message)
           console.log("attire messageis thiiiiiiis ",data.attire.message)
-          // console.log("chal geya maja aa geya ")
-
-          // console.log("Attire check in monitoring screen ",data)
           break;  
 
         case 'yoga_analysis':
@@ -150,6 +162,7 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         case 'ready':
           console.log('WebView model loaded successfully');
           setWebViewLoaded(true);
+          setEnableButton(true); // Enable button when WebView is ready
           break; // ← ADD THIS
 
         case 'ping':
@@ -169,6 +182,8 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
       setWebViewError('Failed to parse WebView message');
     }
   }, []);
+
+  console.log(enableButton);
 
   const captureAndSendPhoto = async () => {
     try {
@@ -195,8 +210,20 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         console.log('Photo sent to WebView');
       }
 
+      if(groomingMode===true){
+        console.log("grooming check modal is running")
+        const message = {
+        command: 'grooming',
+        image: `data:image/jpeg;base64,${base64}`,
+        from: 'sending photo',
+        };
+        console.log('Sending photo to WebView');
+        webviewRef.current.postMessage(JSON.stringify(message));
+        console.log('Photo sent to WebView');
+      }
 
-      if(yogaMode===false){
+
+      if(yogaMode===false && attireMode===false){
         const message = {
         command: 'predict',
         image: `data:image/jpeg;base64,${base64}`,
@@ -353,7 +380,12 @@ const PostureMonitoringScreen = ({ navigation, route }) => {
         postureData={postureData} // ✅ pass here
         yogaData={yogaData}
         attireData={attireData}
+        groomingData={groomingData}
+        groomingMode={groomingMode}
+        groomingStatus={groomingStatus}
+        enableButton={enableButton}
         yogaMode={yogaMode}
+        attireMode={attireMode}
         alertsCount={alertsCount}
         cameraPosition={cameraPosition}
         // onBack={() => navigation.goBack()}

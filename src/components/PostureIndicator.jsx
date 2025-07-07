@@ -15,7 +15,11 @@ const PostureIndicator = ({
   reason = null,
   yogaFeedback ,
   yogaMode,
-  attireData
+  attireData,
+  attireMode,
+  groomingData,
+  groomingMode,
+  groomingStatus
 }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
@@ -26,13 +30,23 @@ const PostureIndicator = ({
 
   // console.log(message)
 
-  const message = yogaMode && yogaFeedback?.length > 0
-    ? getPostureMessage(yogaFeedback)
-    : attireData
-    ? getPostureMessage(attireData)
-    : getPostureMessage(postureStatus);
+  // const message = yogaMode && yogaFeedback?.length > 0
+  //   ? getPostureMessage(yogaFeedback)
+  //   : attireData
+  //   ? getPostureMessage(attireData)
+  //   : getPostureMessage(postureStatus);
 
-  console.log("Final message:", message);
+  // console.log("Final message:", message);
+
+  const message = groomingMode && groomingData
+  ? getPostureMessage(groomingData)
+  : yogaMode && yogaFeedback?.length > 0
+  ? getPostureMessage(yogaFeedback)
+  : attireMode && attireData
+  ? getPostureMessage(attireData)
+  : getPostureMessage(postureStatus);
+
+console.log("Final message:", message);
   
 
   useEffect(() => {

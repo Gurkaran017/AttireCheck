@@ -21,7 +21,12 @@ const CameraOverlay = ({
   onChangeAsana,
   yogaMode,
   yogaData,
-  attireData
+  attireData,
+  attireMode,
+  groomingData,
+  groomingMode,
+  groomingStatus,
+  enableButton
 }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideTopAnim = useRef(new Animated.Value(0)).current;
@@ -93,6 +98,10 @@ const CameraOverlay = ({
               yogaFeedback={yogaData.feedback}
               yogaMode={yogaMode}
               attireData={attireData}
+              attireMode={attireMode}
+              groomingData={groomingData}
+              groomingMode={groomingMode}
+              groomingStatus={groomingStatus}
             />
           </Animated.View>
         )}
@@ -118,6 +127,7 @@ const CameraOverlay = ({
             selectedAsana={selectedAsana}
             onChangeAsana={onChangeAsana}
             yogaMode={yogaMode}
+            enableButton={enableButton}
             
           />
         )}
