@@ -25,8 +25,9 @@ const CameraOverlay = ({
   attireMode,
   groomingData,
   groomingMode,
-  groomingStatus,
-  enableButton
+  enableButton,
+  backgroundData,
+  backgroundMode,
 }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideTopAnim = useRef(new Animated.Value(0)).current;
@@ -101,7 +102,8 @@ const CameraOverlay = ({
               attireMode={attireMode}
               groomingData={groomingData}
               groomingMode={groomingMode}
-              groomingStatus={groomingStatus}
+              backgroundData={backgroundData}
+              backgroundMode={backgroundMode}
             />
           </Animated.View>
         )}

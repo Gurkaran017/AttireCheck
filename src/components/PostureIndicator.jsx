@@ -6,7 +6,9 @@ const postureColors = {
   good: '#10B981',         // Emerald green
   bad: '#EF4444',          // Red
   average: '#F59E0B',      // Amber
-  unknown: '#6B7280'       // Gray
+  unknown: '#6B7280' ,      // Gray
+  background1 : '#10B981',  
+  background1 : '#EF4444',  
 };
 
 const PostureIndicator = ({
@@ -19,32 +21,21 @@ const PostureIndicator = ({
   attireMode,
   groomingData,
   groomingMode,
-  groomingStatus
+  backgroundData,
+  backgroundMode
 }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
-
-  // const message = yogaMode === false
-  // ? getPostureMessage(postureStatus)
-  // : getPostureMessage(yogaFeedback?.length > 0 ? yogaFeedback : "unknown");
-
-  // console.log(message)
-
-  // const message = yogaMode && yogaFeedback?.length > 0
-  //   ? getPostureMessage(yogaFeedback)
-  //   : attireData
-  //   ? getPostureMessage(attireData)
-  //   : getPostureMessage(postureStatus);
-
-  // console.log("Final message:", message);
-
-  const message = groomingMode && groomingData
-  ? getPostureMessage(groomingData)
-  : yogaMode && yogaFeedback?.length > 0
-  ? getPostureMessage(yogaFeedback)
-  : attireMode && attireData
-  ? getPostureMessage(attireData)
-  : getPostureMessage(postureStatus);
+  const message =
+    backgroundMode && backgroundData
+      ? getPostureMessage(backgroundData)
+      : groomingMode && groomingData
+      ? getPostureMessage(groomingData)
+      : yogaMode && yogaFeedback?.length > 0
+      ? getPostureMessage(yogaFeedback)
+      : attireMode && attireData
+      ? getPostureMessage(attireData)
+      : getPostureMessage(postureStatus);
 
 console.log("Final message:", message);
   

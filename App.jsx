@@ -15,6 +15,7 @@ const PostureHome = require('./src/screens/pages/Homepage').default;
 const YogaHome = require('./src/screens/pages/YogaHomepage').default;
 const AttireHome = require('./src/screens/pages/AttireHomepage').default;
 const GroomingHome = require('./src/screens/pages/GroomingHomepage').default;
+const BackgroundHome = require('./src/screens/pages/BackgroundHomepage').default;
 const PostureMonitoring = require('./src/screens/MonitoringScreen').default;
 const YogaMonitoring = require('./src/screens/YogaMonitoring').default;
 
@@ -60,6 +61,15 @@ const BottomTabs = () => (
       options={{
         tabBarIcon: ({ color, size }) => (
           <Icon name="sparkles-outline" color={color} size={size} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="inspect"
+      component={BackgroundHome}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="shield-checkmark-outline" color={color} size={size} />
         ),
       }}
     />

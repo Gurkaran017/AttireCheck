@@ -6,6 +6,10 @@ export const getPostureColor = (status) => {
       return "#F59E0B"
     case "poor":
       return "#EF4444"
+    case "background1":
+      return "#10B981"  
+    case "background2":
+      return "#EF4444"  
     default:
       return "#6B7280"
   }
@@ -25,6 +29,10 @@ export const getPostureMessage = (status) => {
       return "✅ You look professionally dressed"  
     case "attire2":
       return "⚠️ Your attire may not look professional"    
+    case "clean":
+      return "✅ Clean"   
+    case "messy":
+      return "⚠️Messy"  
     case "groomingGood":
       return "✅ Face is clearly visible and properly framed"   
     case "grooming1":
@@ -34,7 +42,11 @@ export const getPostureMessage = (status) => {
     case "grooming3":
       return "⚠️ Face is not centered. Align your face more toward the middle."            
     case "fail":
-      return "No face detected. Make sure your face is clearly visible."              
+      return "No face detected. Make sure your face is clearly visible."    
+    case "background1":
+      return "Plain Background"  
+    case "background2":
+      return "Messy Background"                  
     default:
       return status;
   }

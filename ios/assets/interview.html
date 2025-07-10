@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Posture Detection</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap:" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0"></script>
+  </head>
+
+  <body>
+    <script>
+      let backgroundMode = false;
+      let attireMode = false;
+      let groomingMode = false;
+
+      let backgroundModel;
+      let attireModel;
+      let groomingModel;
+
+    //   const labels = ['Formal', 'Casual'];
+      const labels = ['Plain Background', 'Messy Background'];
+      const attireLabels = ['attire1','attire2', ];
+      const groomingLabels = ['clean', 'messy'];
+
+      // Notify React Native that the WebView is ready
+      window.addEventListener('load', () => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({type: 'log', message: '✅ WebView script loaded!'}),
+        );
+      });
+
+      async function prepareModel() {
+        try {
+          await tf.setBackend('webgl');
+          await tf.ready();
+        
+          backgroundModel = await tf.loadLayersModel(
+            'https://teachablemachine.withgoogle.com/models/fS2PUg2gKp/model.json',
+          );
+          attireModel = await tf.loadLayersModel(
+            'https://teachablemachine.withgoogle.com/models/riDYQqTR3/model.json',
+          );
+          groomingModel = await tf.loadLayersModel(
+            'https://teachablemachine.withgoogle.com/models/_hhBfZz4I/model.json',
+          );
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'ready',
+              status: 'model_ready',
+              message:
+                '✅ MoveNet , Teachable Machine model , BlazeFace & MobileNet loaded with CPU backend',
+              timestamp: Date.now(),
+            }),
+          );
+        } catch (err) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'error',
+              message: '❌ Background Model init failed: ' + err.message,
+            }),
+          );
+        }
+      }
+
+      async function analyzeBackground(imgElement) {
+
+        const tensor = tf.browser
+            .fromPixels(imgElement)
+            .resizeNearestNeighbor([224, 224])
+            .toFloat()
+            .div(255.0)
+            .expandDims();
+
+          const prediction = backgroundModel.predict(tensor);
+
+          const predictionData = await prediction.data();
+          const predictedIndex = predictionData.indexOf(
+            Math.max(...predictionData)
+          );
+          const predictedLabel = labels[predictedIndex];
+
+          tensor.dispose();
+          prediction.dispose();
+
+          const result = {
+            attireType: predictedLabel,
+          };
+
+    
+        return {
+          status: 'success',
+          message: 'Background analysis completed done',
+          result: result,
+        };
+      }
+
+      async function analyzeAttire(imgElement) {
+
+        const tensor = tf.browser
+            .fromPixels(imgElement)
+            .resizeNearestNeighbor([224, 224])
+            .toFloat()
+            .div(255.0)
+            .expandDims();
+
+          const prediction = attireModel.predict(tensor);
+
+          const predictionData = await prediction.data();
+          const predictedIndex = predictionData.indexOf(
+            Math.max(...predictionData)
+          );
+          const predictedLabel = attireLabels[predictedIndex];
+
+          tensor.dispose();
+          prediction.dispose();
+
+          const result = {
+            attireType: predictedLabel,
+          };
+
+    
+        return {
+          status: 'success',
+          message: 'attire analysis completed done',
+          result: result,
+        };
+      }
+
+      async function analyzeGrooming(imgElement) {
+
+        const tensor = tf.browser
+            .fromPixels(imgElement)
+            .resizeNearestNeighbor([224, 224])
+            .toFloat()
+            .div(255.0)
+            .expandDims();
+
+          const prediction = groomingModel.predict(tensor);
+
+          const predictionData = await prediction.data();
+          const predictedIndex = predictionData.indexOf(
+            Math.max(...predictionData)
+          );
+          const predictedLabel = groomingLabels[predictedIndex];
+
+          tensor.dispose();
+          prediction.dispose();
+
+          const result = {
+            attireType: predictedLabel,
+          };
+
+    
+        return {
+          status: 'success',
+          message: 'attire analysis completed done',
+          result: result,
+        };
+      }
+
+
+
+      async function predictPoseFromBase64(base64Image) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = base64Image;
+          img.crossOrigin = 'anonymous';
+
+          img.onload = async () => {
+            try {
+              img.style.display = 'none';
+              document.body.appendChild(img);
+
+              if (backgroundMode === true) {
+                const backgroundData = await analyzeBackground(img);
+
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'background_analysis',
+                    status: 'success',
+                    background: backgroundData,
+                    timestamp: Date.now(),
+                  }),
+                );
+
+                document.body.removeChild(img);
+              }
+              if (attireMode === true) {
+                  const attireData = await analyzeAttire(img);
+
+                  window.ReactNativeWebView.postMessage(
+                    JSON.stringify({
+                      type: 'attire_analysis',
+                      status: 'success',
+                      attire: attireData,
+                      timestamp: Date.now(),
+                    }),
+                  );
+
+                  document.body.removeChild(img);
+                  
+                }
+              if (groomingMode === true) {
+                const groomingData = await analyzeGrooming(img);
+
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'grooming_analysis',
+                    status: 'success',
+                    grooming: groomingData,
+                    timestamp: Date.now(),
+                  }),
+                );
+
+                document.body.removeChild(img);
+                
+              }  
+            } catch (err) {
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'error',
+                  message: '❌ detection estimation error: ' + err.message,
+                }),
+              );
+              reject(err);
+            }
+          };
+
+          img.onerror = () => {
+            const msg = '❌ Failed to load image';
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({type: 'error', message: msg}),
+            );
+            reject(new Error(msg));
+          };
+        });
+      }
+
+      function handleLogMessage(event) {
+        try {
+          const rawData = event.data;
+
+          if (!rawData || rawData === 'undefined') {
+            console.warn(
+              '❗ Ignoring invalid message from React Native:',
+              rawData,
+            );
+            return;
+          }
+
+          const message =
+            typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+
+          if (message.command === 'background' && message.image) {
+            backgroundMode = true;
+            predictPoseFromBase64(message.image)
+              .then(() => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'log',
+                    message: '✅ Background check completed',
+                    timestamp: Date.now(),
+                  }),
+                );
+              })
+              .catch(err => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'error',
+                    message: '❌ Background prediction failed: ' + err.message,
+                    timestamp: Date.now(),
+                  }),
+                );
+              });
+          }
+          if (message.command === 'attire' && message.image) {
+            attireMode = true;
+            predictPoseFromBase64(message.image)
+              .then(() => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'log',
+                    message: '✅ attire check prediction completed',
+                    timestamp: Date.now(),
+                  }),
+                );
+              })
+              .catch(err => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'error',
+                    message: '❌ Prediction failed: ' + err.message,
+                    timestamp: Date.now(),
+                  }),
+                );
+              });
+          }
+          if (message.command === 'grooming' && message.image) {
+            groomingMode = true;
+            predictPoseFromBase64(message.image)
+              .then(() => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'log',
+                    message: '✅ Grooming check prediction completed',
+                    timestamp: Date.now(),
+                  }),
+                );
+              })
+              .catch(err => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'error',
+                    message: '❌ Prediction failed: ' + err.message,
+                    timestamp: Date.now(),
+                  }),
+                );
+              });
+          }
+          else {
+            // Generic message logging
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: 'log',
+                message: message.message || 'No message provided',
+                from: message.from || 'unknown',
+                timestamp: Date.now(),
+              }),
+            );
+          }
+        } catch (err) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'error',
+              message: '❌ Errorrrr in message handler: ' + err.message,
+              timestamp: Date.now(),
+            }),
+          );
+        }
+      }
+
+      // window.ReactNativeWebView.onMessage = handleLogMessage;
+      // document.addEventListener('message', handleLogMessage);
+
+      window.onload = function () {
+        document.addEventListener('message', handleLogMessage); // Android
+        window.addEventListener('message', handleLogMessage); // iOS
+      };
+
+      // Notify React Native immediately and start model prep
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: 'ping',
+          message: '📡 pose.html loaded and ready',
+          timestamp: Date.now(),
+        }),
+      );
+
+      prepareModel();
+    </script>
+  </body>
+</html>
